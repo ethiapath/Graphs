@@ -30,11 +30,11 @@ def main():
     graph.add_directed_edge('4', '6')
     print(graph.vertices)
 
-    o = []
-    p = lambda a : o.append(a)
+    # o = []
+    # p = lambda a : o.append(a)
     # graph.bft('1', p)
-    print(o)
-    graph.bfs('1', '7')
+    # print(o)
+    graph.bfs('7', '1')
 
 if __name__ == '__main__':
     # TODO - parse argv

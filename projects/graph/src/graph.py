@@ -89,42 +89,42 @@ class Graph:
             visited.add(queue.pop(0))
 
     def bfs(self, starting_vertex_id, target=None):
-        # create an empty queue
+
         q = Queue()
         # create an empty list (set) of visted vertices
-        visted = set()
+        # visted = set()
 
         # list that will record the path taken
-        # should hold parent nodes
-        path = []
+        paths = []
+        subpath = []
         prev = None
         # put the starting vertex in our Queue
-        q.enqueue(starting_vertex_id)
-        # while the queue is not empty...
+        q.enqueue([starting_vertex_id])
         counter = 0
+        depth = 0
         while q.size() > 0:
-            # dequeue the first node from the queue
+            # dequeue the first subpath from the queue
             v = q.dequeue()
-            # v.color = 'grey'
-            path.append(prev)
-            # found target vertex
-            if target and v == target:
-                print(f'found: {target}')
-                for p in range(len(path), 0):
-                    if path[p-1] in self.vertices[path[p]]:
-                        print(path[p])
-                print(path)
-                return True
-            # if that node has not been visted
-            if v not in visted:
-                # mark it as visted 
-                visted.add(v)
-                print(v)
-                # then put all of its children into the queue
-                for neighbor in self.vertices[v]:
-                    q.enqueue(neighbor)
-            prev = v
-            counter += 1
+  
+            depth += 1
+            # mark it as visted 
+            # visted.add(v)
+            print(v)
+            # then put all of its neighbors into the queue
+            for neighbor in self.vertices[v[len(v)-1]]:
+                subpath = []
+                subpath = v.copy()
+                if neighbor not in subpath:
+                    subpath.append(neighbor)
+                    if subpath[len(subpath)-1] == target:
+                        print(f'shortest path: {subpath}')
+                        return subpath
+                    # path.append(v)
+                    q.enqueue(subpath)
+            # prev = v
+            # counter += 1
+            
+        print(paths)
         return False
 # queue = [3, 6, 7]
 # visted = {1, 2, 4}
