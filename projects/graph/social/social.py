@@ -1,12 +1,13 @@
 import random
+from collections import deque
 class Queue():
     def __init__(self):
-        self.queue = []
+        self.queue = deque
     def enqueue(self, value):
         self.queue.append(value)
     def dequeue(self):
         if self.size() > 0:
-            return self.queue.pop(0)
+            return self.queue.popleft()
         else:
             return None
     def size(self):
@@ -72,12 +73,15 @@ class SocialGraph:
         # generate num of friendships for each user
         for i in range(numUsers):
             if friends_left > 0:
+                # get num friendships for user
                 friends = round(random.random()*(avgFriendships*2))
                 friends_left -= friends
                 friendships.append(friends)
             elif friends <= 0:
                 friendships.append(0)
 
+        ''' adjust num friendships '''
+        # too few friendships
         while sum(friendships) < total_friends:
             print('adding more')
             for i in range(len(friendships)):
@@ -85,8 +89,9 @@ class SocialGraph:
                     friendships[i] += 1
                     friends_left -= 1
 
+        # too many friendships
         while sum(friendships) > total_friends:
-            print('adding more')
+            print('removing some')
             for j in range(len(friendships)):
                 if friends_left:
                     friendships[j] -= 1
@@ -103,7 +108,6 @@ class SocialGraph:
                             self.addFriendship(user, new_friend_index)
                             friendships[new_friend_index] -= 1
                             friendships[user-1] -= 1
-                            
 
     def getAllSocialPaths(self, userID):
         """
@@ -120,6 +124,7 @@ class SocialGraph:
         for each user find path to userID
         use a shortest path algo on each user
         '''
+        # 
         for u in self.users:
             # print(u)
             path = self.bfs(u, userID)
@@ -128,27 +133,18 @@ class SocialGraph:
         return visited
 
     def bfs(self, starting_vertex_id, target=None):
-
-        q = Queue()
-        # create an empty list (set) of visted vertices
-        # visted = set()
+        # create a queue
+        q = deque() # use append and popleft for queue operations
 
         # list that will record the path taken
         paths = []
         subpath = []
         prev = None
         # put the starting vertex in our Queue
-        q.enqueue([starting_vertex_id])
-        counter = 0
-        depth = 0
-        while q.size() > 0:
+        q.append([starting_vertex_id])
+        while len(q) > 0:
             # dequeue the first subpath from the queue
-            v = q.dequeue()
-  
-            depth += 1
-            # mark it as visted 
-            # visted.add(v)
-            # print(v)
+            v = q.popleft()
             # then put all of its neighbors into the queue
             for neighbor in self.friendships[v[-1]]:
                 subpath = []
@@ -156,19 +152,46 @@ class SocialGraph:
                 if neighbor not in subpath:
                     subpath.append(neighbor)
                     if subpath[-1] == target:
-                        # print(f'shortest path: {subpath}')
                         return subpath
-                    # path.append(v)
-                    q.enqueue(subpath)
-            # prev = v
-            # counter += 1
-            
-        # print(paths)
+                    q.append(subpath)
+        return None
+
+
+    def percent_in_network(self, connections):
+        users_in_network = set()
+        for user in connections:
+            for path in connections[user]:
+                # print(path)
+                users_in_network.add(user)
+                # forsuser in path:
+        total_users = len(self.users)
+        return len(users_in_network)/total_users
+
+def size_of_users_network(user):
+
+    connections = sg.getAllSocialPaths(user)
+    percent = percent_in_network(connections)
+    print(f'percent of users in {user}\'s social network: {percent}')
+    return percent
+
+def avg_deg_of_seperation(connections):
+    if len(connections) > 0:
+        return sum([len(connections[i]) for i in connections])/len(connections)
+    else:
         return None
 
 if __name__ == '__main__':
     sg = SocialGraph()
     sg.populateGraph(10, 2)
+    # sg.populateGraph(100, 5)
     print(sg.friendships)
     connections = sg.getAllSocialPaths(1)
     print(connections)
+    print(len(connections))
+
+    print('avg degree of seperation: ', avg_deg_of_seperation(connections))
+
+    print(f'percent of users in {1}\'s social network: {sg.percent_in_network(connections)}')
+
+    # print(sum([len(c) for c in connections])/len(connections))
+
