@@ -1,7 +1,8 @@
 """
 Simple graph implementation
 """
-
+from collections import deque
+from time import time
 class Queue():
     def __init__(self):
         self.queue = []
@@ -78,6 +79,9 @@ class Graph:
                 for neighbor in self.vertices[v]:
                     q.enqueue(neighbor)
 
+    def dft_recursive(self, starting_vertex_id):
+        pass
+
     def bf_traverse(self, start):
         queue = [start]
         visited = set()
@@ -111,12 +115,12 @@ class Graph:
             # visted.add(v)
             print(v)
             # then put all of its neighbors into the queue
-            for neighbor in self.vertices[v[len(v)-1]]:
+            for neighbor in self.vertices[v[-1]]:
                 subpath = []
                 subpath = v.copy()
                 if neighbor not in subpath:
                     subpath.append(neighbor)
-                    if subpath[len(subpath)-1] == target:
+                    if subpath[-1] == target:
                         print(f'shortest path: {subpath}')
                         return subpath
                     # path.append(v)

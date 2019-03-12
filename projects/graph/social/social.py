@@ -1,4 +1,16 @@
-
+import random
+class Queue():
+    def __init__(self):
+        self.queue = []
+    def enqueue(self, value):
+        self.queue.append(value)
+    def dequeue(self):
+        if self.size() > 0:
+            return self.queue.pop(0)
+        else:
+            return None
+    def size(self):
+        return (len(self.queue))
 
 class User:
     def __init__(self, name):
@@ -45,10 +57,53 @@ class SocialGraph:
         self.users = {}
         self.friendships = {}
         # !!!! IMPLEMENT ME
+        
 
         # Add users
+        # create users
+        for i in range(numUsers):
+            self.addUser(f' User #{i+1}')
+
+        friendships = []
+        friends_left = numUsers*avgFriendships
+        total_friends = numUsers*avgFriendships
+
+
+        # generate num of friendships for each user
+        for i in range(numUsers):
+            if friends_left > 0:
+                friends = round(random.random()*(avgFriendships*2))
+                friends_left -= friends
+                friendships.append(friends)
+            elif friends <= 0:
+                friendships.append(0)
+
+        while sum(friendships) < total_friends:
+            print('adding more')
+            for i in range(len(friendships)):
+                if friends_left:
+                    friendships[i] += 1
+                    friends_left -= 1
+
+        while sum(friendships) > total_friends:
+            print('adding more')
+            for j in range(len(friendships)):
+                if friends_left:
+                    friendships[j] -= 1
+                    friends_left += 1
 
         # Create friendships
+        for user in self.users:
+            if len(friendships) > user-1:
+                if friendships[user-1]:
+                    for new_friend_index in range(len(friendships)):
+                        if friendships[new_friend_index] == friendships[user-1]:
+                            pass
+                        elif friendships[new_friend_index] and friendships[user-1]:
+                            self.addFriendship(user, new_friend_index)
+                            friendships[new_friend_index] -= 1
+                            friendships[user-1] -= 1
+                            
 
     def getAllSocialPaths(self, userID):
         """
@@ -61,8 +116,55 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        '''
+        for each user find path to userID
+        use a shortest path algo on each user
+        '''
+        for u in self.users:
+            # print(u)
+            path = self.bfs(u, userID)
+            if path:
+                visited[u] = path
         return visited
 
+    def bfs(self, starting_vertex_id, target=None):
+
+        q = Queue()
+        # create an empty list (set) of visted vertices
+        # visted = set()
+
+        # list that will record the path taken
+        paths = []
+        subpath = []
+        prev = None
+        # put the starting vertex in our Queue
+        q.enqueue([starting_vertex_id])
+        counter = 0
+        depth = 0
+        while q.size() > 0:
+            # dequeue the first subpath from the queue
+            v = q.dequeue()
+  
+            depth += 1
+            # mark it as visted 
+            # visted.add(v)
+            # print(v)
+            # then put all of its neighbors into the queue
+            for neighbor in self.friendships[v[-1]]:
+                subpath = []
+                subpath = v.copy()
+                if neighbor not in subpath:
+                    subpath.append(neighbor)
+                    if subpath[-1] == target:
+                        # print(f'shortest path: {subpath}')
+                        return subpath
+                    # path.append(v)
+                    q.enqueue(subpath)
+            # prev = v
+            # counter += 1
+            
+        # print(paths)
+        return None
 
 if __name__ == '__main__':
     sg = SocialGraph()
