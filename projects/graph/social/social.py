@@ -58,6 +58,22 @@ class SocialGraph:
         self.users = {}
         self.friendships = {}
         # !!!! IMPLEMENT ME
+        # Add users
+        for i in range(numUsers):
+            self.addUser(f"User {i+1}")
+
+        # Create friendships
+        possibleFriendships = []
+        for userID in self.users:
+            for friendID in range(userID + 1, self.lastID + 1):
+                possibleFriendships.append( (userID, friendID) )
+        print(possibleFriendships)
+        random.shuffle(possibleFriendships)
+        print(possibleFriendships)
+        for friendship in possibleFriendships[: (numUsers * avgFriendships) // 2 ]:
+            print(f"CREATING FRIENDSHIP: {friendship}")
+            self.addFriendship(friendship[0], friendship[1])
+        '''
         
 
         # Add users
@@ -80,7 +96,7 @@ class SocialGraph:
             elif friends <= 0:
                 friendships.append(0)
 
-        ''' adjust num friendships '''
+        # adjust num friendships
         # too few friendships
         while sum(friendships) < total_friends:
             print('adding more')
@@ -108,29 +124,8 @@ class SocialGraph:
                             self.addFriendship(user, new_friend_index)
                             friendships[new_friend_index] -= 1
                             friendships[user-1] -= 1
-
-    def getAllSocialPaths(self, userID):
-        """
-        Takes a user's userID as an argument
-
-        Returns a dictionary containing every user in that user's
-        extended network with the shortest friendship path between them.
-
-        The key is the friend's ID and the value is the path.
-        """
-        visited = {}  # Note that this is a dictionary, not a set
-        # !!!! IMPLEMENT ME
         '''
-        for each user find path to userID
-        use a shortest path algo on each user
-        '''
-        # 
-        for u in self.users:
-            # print(u)
-            path = self.bfs(u, userID)
-            if path:
-                visited[u] = path
-        return visited
+
 
     def bfs(self, starting_vertex_id, target=None):
         # create a queue
@@ -156,23 +151,53 @@ class SocialGraph:
                     q.append(subpath)
         return None
 
+    def getAllSocialPaths(self, userID):
+        """
+        Takes a user's userID as an argument
+
+        Returns a dictionary containing every user in that user's
+        extended network with the shortest friendship path between them.
+
+        The key is the friend's ID and the value is the path.
+        """
+        visited = {}  # Note that this is a dictionary, not a set
+        # !!!! IMPLEMENT ME
+        '''
+        for each user find path to userID
+        use a shortest path algo on each user
+        '''
+        # 
+        for u in self.users:
+            # print(u)
+            path = self.bfs(u, userID)
+            if path:
+                visited[u] = path
+        return visited
 
     def percent_in_network(self, connections):
         users_in_network = set()
-        for user in connections:
-            for path in connections[user]:
-                # print(path)
-                users_in_network.add(user)
+        ''' 
+        finds all users that connect to the the first user in connections
+        '''
+        for user in connections: # will access a list
+            # print('user', user, connections[user], user not in users_in_network)
+            
+            # if user not in users_in_network:
+            for friend in connections[user]: # users in path
+                # print('friend', friend)
+                if user not in users_in_network:
+                    users_in_network.add(friend)
                 # forsuser in path:
         total_users = len(self.users)
         return len(users_in_network)/total_users
 
-def size_of_users_network(user):
+    def size_of_users_network(self, user):
 
-    connections = sg.getAllSocialPaths(user)
-    percent = percent_in_network(connections)
-    print(f'percent of users in {user}\'s social network: {percent}')
-    return percent
+        connections = sg.getAllSocialPaths(user)
+        percent = self.percent_in_network(connections)
+        print(f'percent of users in {user}\'s social network: {percent}',
+              f'avg deg of seperation {avg_deg_of_seperation(connections)}')
+        return percent
 
 def avg_deg_of_seperation(connections):
     if len(connections) > 0:
@@ -182,16 +207,18 @@ def avg_deg_of_seperation(connections):
 
 if __name__ == '__main__':
     sg = SocialGraph()
-    sg.populateGraph(10, 2)
-    # sg.populateGraph(100, 5)
+    # sg.populateGraph(10, 2)
+    sg.populateGraph(100, 5)
     print(sg.friendships)
     connections = sg.getAllSocialPaths(1)
     print(connections)
     print(len(connections))
 
-    print('avg degree of seperation: ', avg_deg_of_seperation(connections))
+    # print('avg degree of seperation: ', avg_deg_of_seperation(connections))
 
-    print(f'percent of users in {1}\'s social network: {sg.percent_in_network(connections)}')
+    sg.size_of_users_network(1)
+    # print(f'percent of users in {1}\'s social network: {sg.percent_in_network(connections)}')
+    sg.size_of_users_network(2)
 
     # print(sum([len(c) for c in connections])/len(connections))
 

@@ -3,14 +3,15 @@ Simple graph implementation
 """
 from collections import deque
 from time import time
+
 class Queue():
     def __init__(self):
-        self.queue = []
+        self.queue = deque
     def enqueue(self, value):
         self.queue.append(value)
     def dequeue(self):
         if self.size() > 0:
-            return self.queue.pop(0)
+            return self.queue.popleft()
         else:
             return None
     def size(self):
@@ -79,7 +80,7 @@ class Graph:
                 for neighbor in self.vertices[v]:
                     q.enqueue(neighbor)
 
-    def dft_recursive(self, starting_vertex_id):
+    def dft_recursive(self, starting_vertex_id, target=None, visited, path):
         pass
 
     def bf_traverse(self, start):
@@ -94,7 +95,7 @@ class Graph:
 
     def bfs(self, starting_vertex_id, target=None):
 
-        q = Queue()
+        q = deque() # use append and popleft for fifo
         # create an empty list (set) of visted vertices
         # visted = set()
 
@@ -103,12 +104,12 @@ class Graph:
         subpath = []
         prev = None
         # put the starting vertex in our Queue
-        q.enqueue([starting_vertex_id])
+        q.append([starting_vertex_id])
         counter = 0
         depth = 0
-        while q.size() > 0:
+        while len(q) > 0:
             # dequeue the first subpath from the queue
-            v = q.dequeue()
+            v = q.popleft()
   
             depth += 1
             # mark it as visted 
@@ -124,7 +125,7 @@ class Graph:
                         print(f'shortest path: {subpath}')
                         return subpath
                     # path.append(v)
-                    q.enqueue(subpath)
+                    q.append(subpath)
             # prev = v
             # counter += 1
             
