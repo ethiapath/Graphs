@@ -36,7 +36,7 @@ class World:
 
 
 
-    def printRooms(self):
+    def printRooms(self, currentRoom=None):
         rotatedRoomGrid = []
         for i in range(0, len(self.roomGrid)):
             rotatedRoomGrid.append([None] * len(self.roomGrid))
@@ -62,7 +62,10 @@ class World:
                 else:
                     map_str += " "
                 if room is not None:
-                    map_str += f"{room.id}".zfill(3)
+                    if room.id == currentRoom.id:
+                        map_str += f"\u001b[32m$\u001b[0m{str(room.id)}".zfill(3)
+                    else:
+                        map_str += f"{room.id}".zfill(3)
                 else:
                     map_str += "   "
                 if room is not None and room.e_to is not None:
