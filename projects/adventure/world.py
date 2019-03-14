@@ -63,7 +63,17 @@ class World:
                     map_str += " "
                 if room is not None:
                     if room.id == currentRoom.id:
-                        map_str += f"\u001b[32m$\u001b[0m{str(room.id)}".zfill(3)
+                        # uses ansi charater codes
+                        # http://www.lihaoyi.com/post/BuildyourownCommandLinewithANSIescapecodes.html
+                        playerStr = '\u001b[31m$'
+                        if len(str(room.id)) == 1:
+                            #the space makes it work\|/
+                            map_str += (f"{playerStr} \u001b[0m{str(room.id)}")
+                        elif len(str(room.id)) == 2:
+                            map_str += (f"{playerStr}\u001b[0m{str(room.id)}")
+                        else:
+                            map_str += (f"{playerStr}\u001b[0m{str(room.id)[:2]}")
+
                     else:
                         map_str += f"{room.id}".zfill(3)
                 else:

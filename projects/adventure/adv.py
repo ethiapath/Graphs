@@ -5,6 +5,7 @@ import time
 import random
 
 # Load world
+start_time = time.time()
 world = World()
 
 # You may uncomment the smaller graphs for development and testing purposes.
@@ -38,7 +39,8 @@ world.loadGraph(roomGraph)
 player = Player("Name", world.startingRoom)
 
 world.printRooms(player.currentRoom)
-
+import subprocess as sp
+clear = lambda: sp.call('clear',shell=True)
 # FILL THIS IN
 traversalPath = []
 
@@ -48,7 +50,7 @@ maze_map = {}
 # how will I know which room I came from?
 # '0': {n: '?', 's': }
 
-def map_room_around_player():
+def map_rooms_around_player():
     if player.currentRoom.id not in maze_map:
         maze_map[player.currentRoom.id] = {}
     q = deque()
@@ -87,10 +89,10 @@ back_map = {
 }
 
 def goBack(direction):
-    if debug:
-        print(f'go back {direction}')
-        world.printRooms(player.currentRoom)
-        time.sleep(0.5)
+    # if debug:
+    #     world.printRooms(player.currentRoom)
+    #     print(f'go back {direction}')
+    #     time.sleep(0.5)
     traversalPath.append(back_map[direction])
     player.travel(back_map[direction])
 
@@ -103,18 +105,16 @@ def fillOutMap(room):
 
 # bfs on maze_map to find closest unexplored node
 # with path reverse lookup to find directions
-import subprocess as sp
-clear = lambda: sp.call('clear',shell=True)
 
 def explore(direction, prevRoomId):
     # clear()
-    if debug:
-        world.printRooms(player.currentRoom)
+    # if debug:
+    #     world.printRooms(player.currentRoom)
     fillOutMap(player.currentRoom)
     maze_map[player.currentRoom.id][direction] = prevRoomId
-    if debug:
-        print(maze_map)
-        time.sleep(0.5)
+    # if debug:
+        # print(maze_map)
+        # time.sleep(0.5)
 
     if len(player.currentRoom.getExits()) == 1: # deadend
         goBack(direction)
@@ -123,6 +123,8 @@ def explore(direction, prevRoomId):
     # travel in direction
     traversalPath.append(direction)
     player.travel(direction)
+    # if debug: # print maze with player position
+    #     world.printRooms(player.currentRoom)
     currentRoom = player.currentRoom
     fillOutMap(currentRoom)
     maze_map[prevRoom.id][direction] = prevRoom.id
@@ -134,14 +136,14 @@ def explore(direction, prevRoomId):
             explore(e, currentRoom.id)
     goBack(direction)
 
-def get_unexplored(room):
-    unexplored = []
-    directions = room.getExits()
-    roomId = room.id
-    for d in directions:
-        if maze_map[roomId][d] == '?':
-            unexplored.append(d)
-    return unexplored
+# def get_unexplored(room):
+#     unexplored = []
+#     directions = room.getExits()
+#     roomId = room.id
+#     for d in directions:
+#         if maze_map[roomId][d] == '?':
+#             unexplored.append(d)
+#     return unexplored
 explore('s', '0')
 print(maze_map)
 '''
@@ -171,6 +173,11 @@ visited_rooms = set()
 player.currentRoom = world.startingRoom
 visited_rooms.add(player.currentRoom)
 for move in traversalPath:
+    if debug: # print maze with player position
+        # clear()
+        world.printRooms(player.currentRoom)
+        # time.sleep(0.05)
+        # print(' '*20, move)
     player.travel(move)
     visited_rooms.add(player.currentRoom)
 
@@ -180,20 +187,21 @@ if len(visited_rooms) == len(roomGraph):
 else:
     print("TESTS FAILED: INCOMPLETE TRAVERSAL")
     print(f"{len(roomGraph) - len(visited_rooms)} unvisited rooms")
-
+end_time = time.time()
+print(f'ran in: {end_time - start_time}')
 
 #######
 # UNCOMMENT TO WALK AROUND
 # #######
-player.currentRoom.printRoomDescription(player)
-while True:
+# player.currentRoom.printRoomDescription(player)
+# while True:
 
-    world.printRooms(player.currentRoom)
-    # map_room_around_player()
-    print(maze_map)
+#     world.printRooms(player.currentRoom)
+#     # map_room_around_player()
+#     # print(maze_map)
 
-    cmds = input("-> ").lower().split(" ")
-    if cmds[0] in ["n", "s", "e", "w"]:
-        player.travel(cmds[0], True)
-    else:
-        print("I did not understand that command.")
+#     cmds = input("-> ").lower().split(" ")
+#     if cmds[0] in ["n", "s", "e", "w"]:
+#         player.travel(cmds[0], True)
+#     else:
+#         print("I did not understand that command.")
