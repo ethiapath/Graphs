@@ -80,7 +80,7 @@ class Graph:
                 for neighbor in self.vertices[v]:
                     q.enqueue(neighbor)
 
-    def dft_recursive(self, starting_vertex_id, target=None, visited, path):
+    def dft_recursive(self, current_vertex, target=None, visited, path):
         pass
 
     def bf_traverse(self, start):
