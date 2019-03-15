@@ -4,8 +4,8 @@ from world import World
 import time
 import random
 
-debug = True
-# debug = False
+# debug = True
+debug = False
 DELAY = 0.001
 # Load world
 start_time = time.time()
@@ -52,6 +52,7 @@ maze_map = {}
 # how will I know which room I came from?
 # '0': {n: '?', 's': }
 
+# getRoomInDirection exists...
 def map_rooms_around_player():
     if player.currentRoom.id not in maze_map:
         maze_map[player.currentRoom.id] = {}
@@ -126,6 +127,16 @@ def explore(direction, prevRoomId):
         goBack(direction)
         return
     # this doesn't work as well since I'm using recursion
+    currentRoom = player.currentRoom
+    for adjacent_room_direction in currentRoom.getExits():
+        adjacent_room = currentRoom.getRoomInDirection(adjacent_room_direction)
+        fillOutMap(adjacent_room)
+        # set the adjacent_rooms entrance to the current rooms
+        maze_map[adjacent_room.id][back_map[adjacent_room_direction]] = currentRoom.id
+    # maybe if I set the returning direction in all adjacent rooms to 
+    # the current room I could reduce some back tracking
+    # bc if the room is filled out then it wont be visted
+    # getRoomInDirection
 
     prevRoom = player.currentRoom
     fillOutMap(prevRoom)
@@ -136,9 +147,11 @@ def explore(direction, prevRoomId):
     currentRoom = player.currentRoom
     fillOutMap(currentRoom)
 
+
     # make sure dict for room exists
     # set entrance route to prev room id
-    maze_map[currentRoom.id][back_map[direction]] = prevRoomId
+    next_moves = maze_map[currentRoom.id]
+    next_moves[back_map[direction]] = prevRoomId
     # oh ya direction is the direction of the move just taken
     maze_map[prevRoom.id][direction] = currentRoom.id#prevRoom.id
 
